@@ -1,11 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"log"
+	log "github.com/Sirupsen/logrus"
 	"math/rand"
 	"os"
-	"strconv"
 )
 
 func return_random(num int) string {
@@ -21,15 +21,20 @@ func return_random(num int) string {
 }
 
 func main() {
-	randomInt := os.Args[1]
-	val_toi, err := strconv.Atoi(randomInt)
+	var path = flag.String("f", "log-path.txt", "string")
+	var times = flag.Int("t", 10, "int")
+	flag.Parse()
+	fmt.Println("path:", *path)
+	fmt.Println("times:", *times)
 
+	f, err := os.OpenFile(*path, os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {
-		fmt.Println("Run program with only one integer argument")
 		log.Fatal(err)
 	}
+	log.SetOutput(f)
 
-	ret_val := return_random(val_toi)
+	ret_val := return_random(*times)
 	fmt.Println(ret_val)
+	log.Info(ret_val)
 
 }
