@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
@@ -10,6 +11,10 @@ import (
 	"os"
 	"strconv"
 )
+
+type Response struct {
+	Response string `json:"response"`
+}
 
 func return_random(num int) string {
 	alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
@@ -32,12 +37,20 @@ func req_calc(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	numId := vars["numId"]
 	numInt, err := strconv.Atoi(numId)
+
 	if err != nil {
 		log.Error(err)
 	}
+
 	retVal := return_random(numInt)
 
-	fmt.Fprintln(w, "Results:", retVal)
+	respJson := &Response{
+		Response: retVal,
+	}
+	encodedJson, _ := json.Marshal(respJson)
+
+	fmt.Fprintln(w, string(encodedJson))
+	log.Info(string(encodedJson))
 }
 
 func main() {
